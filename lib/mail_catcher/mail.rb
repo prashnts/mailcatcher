@@ -40,7 +40,7 @@ module MailCatcher::Mail extend self
   def add_message(message)
     @add_message_query ||= db.prepare("INSERT INTO message (sender, recipients, subject, source, type, size, created_at) VALUES (?, ?, ?, ?, ?, ?, datetime('now'))")
 
-    mail = Mail.new(message[:source])
+    mail = Mail.new(message[:source].force_encoding('UTF-8'))
     @add_message_query.execute(message[:sender], JSON.generate(message[:recipients]), mail.subject, message[:source], mail.mime_type || "text/plain", message[:source].length)
     message_id = db.last_insert_row_id
     parts = mail.all_parts
